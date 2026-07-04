@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require('express');
+const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
 const Database = require('better-sqlite3');
 const fs = require('fs');
 const path = require('path');
@@ -59,3 +61,27 @@ app.use((req, res, next) => {
     req.db = db;
     next();
 });
+
+// middlewear
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.json());
+app.use(methodOverride('_method'));
+
+const moviesTvRoutes = require('./routes/moviesTv');
+const booksMangaRoutes = require('./routes/booksManga');
+const gamesRoutes = require('./routes/games');
+
+app.use('/movies-tv', moviesTvRoutes);
+app.use('/books-manga', booksMangaRoutes);
+app.use('/games', gamesRoutes);
+
+app.get('/', async (req, res) => {
+    res.render('index', {});
+});
+
+app.listen(PORT, () => {
+    console.log(`server running on http://localhost:${PORT}`);
+})
