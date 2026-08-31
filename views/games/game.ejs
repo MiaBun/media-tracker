@@ -1,0 +1,67 @@
+<div class="breadcrumb"><a href="/games">Games</a> / <%= game.title %></div>
+
+<div class="detail-head">
+  <div class="poster" style="<%= game.cover_url ? `background-image:url('${game.cover_url}')` : '' %>"></div>
+  <div>
+    <h1><%= game.title %></h1>
+    <div class="sub"><% if (franchise) { %><%= franchise.name %><% } %><% if (game.release_date) { %> · <%= game.release_date %><% } %></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Add a platform</h2></div>
+  <form class="add-form" method="POST" action="/games/<%= game.id %>/platforms">
+    <input type="text" name="platform_name" placeholder="Platform (e.g. Steam, Xbox)" required>
+    <button class="btn primary" type="submit">Add platform</button>
+  </form>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Add an objective category</h2></div>
+  <div class="sub" style="color:var(--text-dim); font-size:13px; margin-bottom:10px;">Categories and objectives are shared across every platform of this game.</div>
+  <form class="add-form" method="POST" action="/games/<%= game.id %>/categories">
+    <input type="text" name="name" placeholder="e.g. Main Quests, Side Quests, Collectibles" required>
+    <button class="btn" type="submit">Add category</button>
+  </form>
+</div>
+
+<% platforms.forEach(p => { %>
+  <div class="platform-card">
+    <div class="ph">
+      <div>
+        <strong><%= p.platform_name %></strong>
+        <span class="badge"><%= p.progress.done %> / <%= p.progress.total %></span>
+      </div>
+      <div class="status-select">
+        <% ['backlog','in_progress','played'].forEach(s => { %>
+          <form class="inline" method="POST" action="/games/platforms/<%= p.id %>/status">
+            <input type="hidden" name="status" value="<%= s %>">
+            <button class="status-pill <%= p.status === s ? 'active' : '' %>" type="submit"><%= s.replace('_',' ') %></button>
+          </form>
+        <% }) %>
+      </div>
+    </div>
+
+    <% p.categories.forEach(cat => { %>
+      <div class="category-block">
+        <h4><%= cat.name %></h4>
+        <% cat.objectives.forEach(o => { %>
+          <div class="objective-row <%= o.completed ? 'done' : '' %>">
+            <form class="inline" method="POST" action="/games/objectives/<%= o.id %>/toggle">
+              <input type="hidden" name="platform_id" value="<%= p.id %>">
+              <button class="check-btn" style="width:20px;height:20px;font-size:11px;"><%= o.completed ? '✓' : '' %></button>
+            </form>
+            <span><%= o.description %></span>
+          </div>
+        <% }) %>
+        <form class="inline" method="POST" action="/games/categories/<%= cat.id %>/objectives" style="display:flex; gap:6px; margin-top:6px;">
+          <input type="text" name="description" placeholder="New objective" style="flex:1">
+          <button class="btn small" type="submit">Add</button>
+        </form>
+      </div>
+    <% }) %>
+    <% if (!p.categories.length) { %>
+      <div class="section-empty">No objective categories yet — add one above.</div>
+    <% } %>
+  </div>
+<% }) %>

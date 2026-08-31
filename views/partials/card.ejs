@@ -1,0 +1,13 @@
+<a class="card" href="<%= href %>">
+  <div class="card-poster <%= cover_url ? '' : 'ph' %>" <% if (cover_url) { %>style="background-image:url('<%= cover_url %>')"<% } %>>
+    <% if (!cover_url) { %><%= title %><% } %>
+    <% if (typeof dateBadge !== 'undefined' && dateBadge) { %><span class="badge date"><%= dateBadge %></span><% } %>
+    <% if (typeof progressPercent !== 'undefined' && progressPercent !== null) { %>
+      <div class="progress-bar"><span style="width:<%= progressPercent %>%"></span></div>
+    <% } %>
+  </div>
+  <div class="card-body">
+    <div class="card-title"><%= title %></div>
+    <% if (typeof sub !== 'undefined' && sub) { %><div class="card-sub"><%= sub %></div><% } %>
+  </div>
+</a>

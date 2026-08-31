@@ -1,0 +1,47 @@
+<div class="breadcrumb"><a href="/screen">Anime, Movies &amp; TV</a> / <%= show.title %></div>
+
+<div class="detail-head">
+  <div class="poster" style="<%= show.cover_url ? `background-image:url('${show.cover_url}')` : '' %>"></div>
+  <div>
+    <h1><%= show.title %></h1>
+    <div class="sub"><%= show.type === 'tv' ? 'TV Show' : 'Movie' %><% if (show.release_date) { %> · <%= show.release_date %><% } %></div>
+    <div class="status-select">
+      <% ['backlog','in_progress','watched'].forEach(s => { %>
+        <form class="inline" method="POST" action="/screen/shows/<%= show.id %>/status">
+          <input type="hidden" name="status" value="<%= s %>">
+          <button class="status-pill <%= show.status === s ? 'active' : '' %>" type="submit"><%= s.replace('_',' ') %></button>
+        </form>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<% if (show.type === 'tv') { %>
+  <div class="section">
+    <div class="section-head"><h2>Add an episode</h2></div>
+    <form class="add-form" method="POST" action="/screen/shows/<%= show.id %>/episodes">
+      <input type="number" name="season" placeholder="Season" value="1" style="max-width:90px">
+      <input type="number" name="number" placeholder="Episode #" required style="max-width:110px">
+      <input type="text" name="title" placeholder="Title (optional)">
+      <input type="date" name="air_date">
+      <button class="btn primary" type="submit">Add episode</button>
+    </form>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Episodes <span class="count"><%= episodes.length %></span></h2></div>
+    <% episodes.forEach(e => { %>
+      <div class="list-row">
+        <div class="meta">
+          <div class="t">S<%= e.season %>E<%= e.number %><% if (e.title) { %> — <%= e.title %><% } %></div>
+          <% if (e.air_date) { %><div class="s"><%= e.air_date %></div><% } %>
+        </div>
+        <div class="actions">
+          <form class="inline" method="POST" action="/screen/episodes/<%= e.id %>/watched">
+            <button class="status-pill <%= e.watched ? 'active' : '' %>" type="submit"><%= e.watched ? 'Watched' : 'Mark watched' %></button>
+          </form>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>

@@ -1,0 +1,159 @@
+<div class="page-header">
+  <h1>Manga &amp; Books</h1>
+</div>
+
+<form class="add-form" method="POST" action="/manga/works">
+  <select name="type">
+    <option value="manga">Manga</option>
+    <option value="book">Book</option>
+  </select>
+  <input type="text" name="title" placeholder="Title" required>
+  <input type="text" name="author" placeholder="Author (optional)">
+  <input type="url" name="cover_url" placeholder="Cover image URL (optional)">
+  <button class="btn primary" type="submit">Add title</button>
+</form>
+
+<div class="section">
+  <div class="section-head"><h2>All titles <span class="count"><%= allWorks.length %></span></h2></div>
+  <% if (!allWorks.length) { %>
+    <div class="section-empty">Nothing added yet — use the form above.</div>
+  <% } else { %>
+    <div class="grid">
+      <% allWorks.forEach(w => { %>
+        <%- include('../partials/card', { href: `/manga/works/${w.id}`, cover_url: w.cover_url, title: w.title, sub: w.type === 'manga' ? 'Manga' : 'Book' }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Recommended next <span class="count"><%= recommended.length %></span></h2></div>
+  <% if (!recommended.length) { %>
+    <div class="section-empty">Nothing to recommend yet — mark something as "reading" to get suggestions.</div>
+  <% } else { %>
+    <div class="row">
+      <% recommended.forEach(r => { %>
+        <% if (r.type === 'manga') { %>
+          <%- include('../partials/card', {
+            href: `/manga/works/${r.work.id}`,
+            cover_url: r.volume.cover_url || r.work.cover_url,
+            title: r.work.title,
+            sub: `Vol. ${r.volume.number}${r.volume.owned ? '' : ' · not owned'}`
+          }) %>
+        <% } else { %>
+          <%- include('../partials/card', {
+            href: `/manga/works/${r.work.id}`,
+            cover_url: r.work.cover_url,
+            title: r.work.title,
+            sub: `Ch. ${r.chapter.number}${r.chapter.owned ? '' : ' · not owned'}`
+          }) %>
+        <% } %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Currently reading</h2></div>
+  <% const hasProgress = inProgress.mangaVols.length || inProgress.bookChaps.length; %>
+  <% if (!hasProgress) { %>
+    <div class="section-empty">Nothing in progress. Mark a volume or chapter as "reading" from its page.</div>
+  <% } else { %>
+    <% inProgress.mangaVols.forEach(v => {
+      const doneCh = v.chapters.filter(c => c.status === 'read').length;
+      const pct = v.chapters.length ? Math.round(doneCh / v.chapters.length * 100) : 0;
+    %>
+      <div class="list-row">
+        <div class="meta">
+          <div class="t"><%= v.work_title %> — Vol. <%= v.number %></div>
+          <div class="s"><%= doneCh %> / <%= v.chapters.length %> chapters read</div>
+        </div>
+        <div class="actions">
+          <form class="inline" method="POST" action="/manga/volumes/<%= v.id %>/next-chapter">
+            <button class="check-btn" title="Mark next chapter read">✓</button>
+          </form>
+          <a class="btn small" href="/manga/works/<%= v.work_id %>">Open</a>
+        </div>
+      </div>
+    <% }) %>
+    <% inProgress.bookChaps.forEach(c => { %>
+      <div class="list-row">
+        <div class="meta">
+          <div class="t"><%= c.work_title %></div>
+          <div class="s">Currently on chapter <%= c.number %></div>
+        </div>
+        <div class="actions">
+          <form class="inline" method="POST" action="/manga/works/<%= c.work_id %>/next-chapter">
+            <button class="check-btn" title="Mark next chapter read">✓</button>
+          </form>
+          <a class="btn small" href="/manga/works/<%= c.work_id %>">Open</a>
+        </div>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Calendar <span class="count">upcoming releases</span></h2></div>
+  <% if (!calendar.length) { %>
+    <div class="section-empty">No upcoming release dates logged.</div>
+  <% } else { %>
+    <% calendar.forEach(item => { %>
+      <div class="calendar-item">
+        <a href="/manga/works/<%= item.work_id %>"><%= item.work_title %> — <%= item.kind === 'volume' ? 'Vol.' : 'Ch.' %> <%= item.number %></a>
+        <span class="date"><%= item.release_date %></span>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Backlog <span class="count">owned, not read</span></h2></div>
+  <% const hasBacklog = backlog.mangaVols.length || backlog.bookChaps.length; %>
+  <% if (!hasBacklog) { %>
+    <div class="section-empty">Nothing in the backlog.</div>
+  <% } else { %>
+    <div class="grid">
+      <% backlog.mangaVols.forEach(v => { %>
+        <%- include('../partials/card', { href: `/manga/works/${v.work_id || ''}`, cover_url: v.cover_url || v.work_cover, title: v.work_title, sub: `Vol. ${v.number}` }) %>
+      <% }) %>
+      <% backlog.bookChaps.forEach(c => { %>
+        <%- include('../partials/card', { href: `/manga/works/${c.work_id || ''}`, cover_url: c.work_cover, title: c.work_title, sub: `Ch. ${c.number}` }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Wishlist <span class="count">not owned</span></h2></div>
+  <% const hasWishlist = wishlist.mangaVols.length || wishlist.bookChaps.length; %>
+  <% if (!hasWishlist) { %>
+    <div class="section-empty">Wishlist is empty.</div>
+  <% } else { %>
+    <div class="grid">
+      <% wishlist.mangaVols.forEach(v => { %>
+        <%- include('../partials/card', { href: `/manga/works/${v.work_id || ''}`, cover_url: v.cover_url || v.work_cover, title: v.work_title, sub: `Vol. ${v.number}` }) %>
+      <% }) %>
+      <% wishlist.bookChaps.forEach(c => { %>
+        <%- include('../partials/card', { href: `/manga/works/${c.work_id || ''}`, cover_url: c.work_cover, title: c.work_title, sub: `Ch. ${c.number}` }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Read</h2></div>
+  <% const hasRead = read.mangaVols.length || read.bookChaps.length; %>
+  <% if (!hasRead) { %>
+    <div class="section-empty">Nothing finished yet.</div>
+  <% } else { %>
+    <div class="grid">
+      <% read.mangaVols.forEach(v => { %>
+        <%- include('../partials/card', { href: `/manga/works/${v.work_id || ''}`, cover_url: v.cover_url || v.work_cover, title: v.work_title, sub: `Vol. ${v.number}` }) %>
+      <% }) %>
+      <% read.bookChaps.forEach(c => { %>
+        <%- include('../partials/card', { href: `/manga/works/${c.work_id || ''}`, cover_url: c.work_cover, title: c.work_title, sub: `Ch. ${c.number}` }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>

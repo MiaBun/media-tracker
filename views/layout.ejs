@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> · Trackr</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">trackr</div>
+    <nav class="pillnav">
+      <a href="/manga" class="<%= typeof section !== 'undefined' && section === 'manga' ? 'active' : '' %>">
+        <span class="dot dot-manga"></span> Manga &amp; Books
+      </a>
+      <a href="/screen" class="<%= typeof section !== 'undefined' && section === 'screen' ? 'active' : '' %>">
+        <span class="dot dot-screen"></span> Anime, Movies &amp; TV
+      </a>
+      <a href="/games" class="<%= typeof section !== 'undefined' && section === 'games' ? 'active' : '' %>">
+        <span class="dot dot-games"></span> Games
+      </a>
+    </nav>
+  </header>
+  <main class="content">
+    <%- body %>
+  </main>
+</body>
+</html>

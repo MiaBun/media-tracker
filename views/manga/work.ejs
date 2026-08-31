@@ -1,0 +1,105 @@
+<div class="breadcrumb"><a href="/manga">Manga &amp; Books</a> / <%= work.title %></div>
+
+<div class="detail-head">
+  <div class="poster <%= work.cover_url ? '' : '' %>" style="<%= work.cover_url ? `background-image:url('${work.cover_url}')` : '' %>"></div>
+  <div>
+    <h1><%= work.title %></h1>
+    <div class="sub"><%= work.type === 'manga' ? 'Manga' : 'Book' %><% if (work.author) { %> · <%= work.author %><% } %></div>
+  </div>
+</div>
+
+<% if (work.type === 'manga') { %>
+  <div class="section">
+    <div class="section-head"><h2>Add a volume</h2></div>
+    <form class="add-form" method="POST" action="/manga/works/<%= work.id %>/volumes">
+      <input type="number" step="0.1" name="number" placeholder="Volume #" required style="max-width:110px">
+      <input type="text" name="title" placeholder="Title (optional)">
+      <input type="url" name="cover_url" placeholder="Cover URL (optional)">
+      <input type="date" name="release_date">
+      <button class="btn primary" type="submit">Add volume</button>
+    </form>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Volumes <span class="count"><%= volumes.length %></span></h2></div>
+    <% volumes.forEach(v => { %>
+      <div class="volume-block">
+        <div class="vh">
+          <div>
+            <strong>Vol. <%= v.number %></strong><% if (v.title) { %> — <%= v.title %><% } %>
+            <% if (v.release_date) { %> <span class="badge"><%= v.release_date %></span><% } %>
+          </div>
+          <div class="actions" style="display:flex; gap:8px; align-items:center;">
+            <form class="inline" method="POST" action="/manga/volumes/<%= v.id %>/owned">
+              <button class="badge <%= v.owned ? 'owned' : '' %>" type="submit" style="border:none;cursor:pointer;">
+                <%= v.owned ? 'Owned' : 'Not owned' %>
+              </button>
+            </form>
+            <div class="status-select">
+              <% ['unread','reading','read'].forEach(s => { %>
+                <form class="inline" method="POST" action="/manga/volumes/<%= v.id %>/status">
+                  <input type="hidden" name="status" value="<%= s %>">
+                  <button class="status-pill <%= v.status === s ? 'active' : '' %>" type="submit"><%= s %></button>
+                </form>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+        <% v.chapters.forEach(c => { %>
+          <div class="chapter-row">
+            <span>Ch. <%= c.number %><% if (c.title) { %> — <%= c.title %><% } %></span>
+            <div class="status-select">
+              <% ['unread','reading','read'].forEach(s => { %>
+                <form class="inline" method="POST" action="/manga/chapters/<%= c.id %>/status">
+                  <input type="hidden" name="status" value="<%= s %>">
+                  <button class="status-pill <%= c.status === s ? 'active' : '' %>" type="submit"><%= s %></button>
+                </form>
+              <% }) %>
+            </div>
+          </div>
+        <% }) %>
+        <form class="inline" method="POST" action="/manga/works/<%= work.id %>/chapters" style="display:flex; gap:6px; margin-top:8px;">
+          <input type="hidden" name="volume_id" value="<%= v.id %>">
+          <input type="number" step="0.1" name="number" placeholder="Ch. #" required style="max-width:90px">
+          <input type="text" name="title" placeholder="Title (optional)">
+          <button class="btn small" type="submit">Add chapter</button>
+        </form>
+      </div>
+    <% }) %>
+  </div>
+<% } else { %>
+  <div class="section">
+    <div class="section-head"><h2>Add a chapter</h2></div>
+    <form class="add-form" method="POST" action="/manga/works/<%= work.id %>/chapters">
+      <input type="number" step="0.1" name="number" placeholder="Chapter #" required style="max-width:110px">
+      <input type="text" name="title" placeholder="Title (optional)">
+      <input type="date" name="release_date">
+      <button class="btn primary" type="submit">Add chapter</button>
+    </form>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Chapters <span class="count"><%= chapters.length %></span></h2></div>
+    <% chapters.forEach(c => { %>
+      <div class="list-row">
+        <div class="meta">
+          <div class="t">Ch. <%= c.number %><% if (c.title) { %> — <%= c.title %><% } %></div>
+          <% if (c.release_date) { %><div class="s"><%= c.release_date %></div><% } %>
+        </div>
+        <div class="actions">
+          <form class="inline" method="POST" action="/manga/chapters/<%= c.id %>/owned">
+            <button class="badge <%= c.owned ? 'owned' : '' %>" type="submit" style="border:none;cursor:pointer;"><%= c.owned ? 'Owned' : 'Not owned' %></button>
+          </form>
+          <div class="status-select">
+            <% ['unread','reading','read'].forEach(s => { %>
+              <form class="inline" method="POST" action="/manga/chapters/<%= c.id %>/status">
+                <input type="hidden" name="status" value="<%= s %>">
+                <button class="status-pill <%= c.status === s ? 'active' : '' %>" type="submit"><%= s %></button>
+              </form>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>

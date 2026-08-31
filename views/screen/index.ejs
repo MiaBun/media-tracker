@@ -1,0 +1,163 @@
+<div class="page-header">
+  <h1>Anime, Movies &amp; TV</h1>
+</div>
+
+<form class="add-form" method="POST" action="/screen/shows">
+  <select name="type">
+    <option value="tv">TV Show</option>
+    <option value="movie">Movie</option>
+  </select>
+  <input type="text" name="title" placeholder="Title" required>
+  <input type="url" name="cover_url" placeholder="Cover image URL (optional)">
+  <input type="date" name="release_date">
+  <button class="btn primary" type="submit">Add</button>
+</form>
+
+<div class="section">
+  <div class="section-head"><h2>All titles <span class="count"><%= allShows.length %></span></h2></div>
+  <% if (!allShows.length) { %>
+    <div class="section-empty">Nothing added yet — use the form above.</div>
+  <% } else { %>
+    <div class="grid">
+      <% allShows.forEach(s => { %>
+        <%- include('../partials/card', { href: `/screen/shows/${s.id}`, cover_url: s.cover_url, title: s.title, sub: s.type }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Timelines</h2></div>
+  <form class="add-form" method="POST" action="/screen/timelines">
+    <input type="text" name="name" placeholder="New timeline name (e.g. MCU Chronological)" required>
+    <button class="btn primary" type="submit">Create timeline</button>
+  </form>
+  <% if (!timelines.length) { %>
+    <div class="section-empty">No timelines yet. Create one, then add movies/shows to it in order.</div>
+  <% } else { %>
+    <% timelines.forEach(t => { %>
+      <div class="list-row" style="flex-direction:column; align-items:stretch;">
+        <div class="meta" style="margin-bottom:8px;"><div class="t"><%= t.name %></div></div>
+        <form class="inline" method="POST" action="/screen/timelines/<%= t.id %>/items" style="display:flex; gap:6px;">
+          <select name="show_id" style="flex:1">
+            <% allShows.forEach(s => { %><option value="<%= s.id %>"><%= s.title %> (<%= s.type %>)</option><% }) %>
+          </select>
+          <button class="btn small" type="submit">Add to end</button>
+        </form>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>In progress</h2></div>
+  <% const hasProgress = inProgress.standalone.length || inProgress.timelines.some(t => t.current); %>
+  <% if (!hasProgress) { %>
+    <div class="section-empty">Nothing in progress. Set a show/movie's status to "in progress" from its page.</div>
+  <% } else { %>
+    <% inProgress.timelines.forEach(t => { %>
+      <% if (t.current) { %>
+        <div class="list-row">
+          <div class="meta">
+            <div class="t"><%= t.name %>: <%= t.current.title %></div>
+            <div class="s">
+              <% if (t.current.type === 'tv' && t.currentNextEpisode) { %>
+                Next up: S<%= t.currentNextEpisode.season %>E<%= t.currentNextEpisode.number %><% if (t.currentNextEpisode.title) { %> — <%= t.currentNextEpisode.title %><% } %>
+              <% } else if (t.current.type === 'movie') { %>
+                Movie · not yet watched
+              <% } %>
+            </div>
+          </div>
+          <div class="actions">
+            <% if (t.current.type === 'tv' && t.currentNextEpisode) { %>
+              <form class="inline" method="POST" action="/screen/shows/<%= t.current.show_id %>/next-episode">
+                <button class="check-btn" title="Mark next episode watched">✓</button>
+              </form>
+            <% } else if (t.current.type === 'movie') { %>
+              <form class="inline" method="POST" action="/screen/shows/<%= t.current.show_id %>/watch-movie">
+                <button class="check-btn" title="Mark movie watched">✓</button>
+              </form>
+            <% } %>
+            <a class="btn small" href="/screen/shows/<%= t.current.show_id %>">Open</a>
+          </div>
+        </div>
+      <% } %>
+    <% }) %>
+    <% inProgress.standalone.forEach(s => { %>
+      <div class="list-row">
+        <div class="meta">
+          <div class="t"><%= s.title %></div>
+          <div class="s">
+            <% if (s.type === 'tv' && s.nextEp) { %>Next up: S<%= s.nextEp.season %>E<%= s.nextEp.number %><% if (s.nextEp.title) { %> — <%= s.nextEp.title %><% } %>
+            <% } else if (s.type === 'movie') { %>Movie · not yet watched<% } %>
+          </div>
+        </div>
+        <div class="actions">
+          <% if (s.type === 'tv' && s.nextEp) { %>
+            <form class="inline" method="POST" action="/screen/shows/<%= s.id %>/next-episode">
+              <button class="check-btn" title="Mark next episode watched">✓</button>
+            </form>
+          <% } else if (s.type === 'movie') { %>
+            <form class="inline" method="POST" action="/screen/shows/<%= s.id %>/watch-movie">
+              <button class="check-btn" title="Mark movie watched">✓</button>
+            </form>
+          <% } %>
+          <a class="btn small" href="/screen/shows/<%= s.id %>">Open</a>
+        </div>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Calendar <span class="count">upcoming</span></h2></div>
+  <% if (!calendar.length) { %>
+    <div class="section-empty">No upcoming dates logged.</div>
+  <% } else { %>
+    <% calendar.forEach(item => { %>
+      <div class="calendar-item">
+        <a href="/screen/shows/<%= item.id %>"><%= item.title %></a>
+        <span class="date"><%= item.release_date %></span>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Movies to watch next</h2></div>
+  <% if (!watchNext.movies.length) { %>
+    <div class="section-empty">No movies queued up.</div>
+  <% } else { %>
+    <div class="grid">
+      <% watchNext.movies.forEach(m => { %>
+        <%- include('../partials/card', { href: `/screen/shows/${m.id}`, cover_url: m.cover_url, title: m.title, sub: m.release_date || '' }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>TV shows to watch next</h2></div>
+  <% if (!watchNext.tv.length) { %>
+    <div class="section-empty">No shows queued up.</div>
+  <% } else { %>
+    <div class="grid">
+      <% watchNext.tv.forEach(s => { %>
+        <%- include('../partials/card', { href: `/screen/shows/${s.id}`, cover_url: s.cover_url, title: s.title }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Watched</h2></div>
+  <% if (!watched.length) { %>
+    <div class="section-empty">Nothing watched yet.</div>
+  <% } else { %>
+    <div class="grid">
+      <% watched.forEach(s => { %>
+        <%- include('../partials/card', { href: `/screen/shows/${s.id}`, cover_url: s.cover_url, title: s.title, sub: s.type }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>

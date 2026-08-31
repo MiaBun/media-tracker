@@ -1,0 +1,108 @@
+<div class="page-header">
+  <h1>Games</h1>
+</div>
+
+<form class="add-form" method="POST" action="/games/games">
+  <input type="text" name="title" placeholder="Game title" required>
+  <select name="franchise_id">
+    <option value="">No franchise</option>
+    <% franchises.forEach(f => { %><option value="<%= f.id %>"><%= f.name %></option><% }) %>
+  </select>
+  <input type="text" name="platform_name" placeholder="Platform (e.g. PS5, Switch)">
+  <input type="url" name="cover_url" placeholder="Cover image URL (optional)">
+  <input type="date" name="release_date">
+  <button class="btn primary" type="submit">Add game</button>
+</form>
+
+<form class="add-form" method="POST" action="/games/franchises">
+  <input type="text" name="name" placeholder="New franchise name" required>
+  <button class="btn" type="submit">Add franchise</button>
+</form>
+
+<div class="section">
+  <div class="section-head"><h2>All games <span class="count"><%= allGames.length %></span></h2></div>
+  <% if (!allGames.length) { %>
+    <div class="section-empty">Nothing added yet — use the form above.</div>
+  <% } else { %>
+    <div class="grid">
+      <% allGames.forEach(g => { %>
+        <%- include('../partials/card', { href: `/games/${g.id}`, cover_url: g.cover_url, title: g.title, sub: g.franchise_name || '' }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Recommended next <span class="count"><%= recommended.length %></span></h2></div>
+  <% if (!recommended.length) { %>
+    <div class="section-empty">Backlog is empty — add a game to get suggestions.</div>
+  <% } else { %>
+    <div class="row">
+      <% recommended.forEach(g => { %>
+        <%- include('../partials/card', {
+          href: `/games/${g.game_id}`,
+          cover_url: g.cover_url,
+          title: g.title,
+          sub: g.platform_name + (g.franchiseStarted ? ' · franchise started' : '')
+        }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Currently playing</h2></div>
+  <% if (!inProgress.length) { %>
+    <div class="section-empty">Nothing in progress right now.</div>
+  <% } else { %>
+    <% inProgress.forEach(g => { %>
+      <div class="list-row">
+        <div class="meta">
+          <div class="t"><%= g.title %> <span class="badge"><%= g.platform_name %></span></div>
+          <div class="s"><%= g.progress.done %> / <%= g.progress.total %> objectives complete<% if (g.franchise_name) { %> · <%= g.franchise_name %><% } %></div>
+        </div>
+        <a class="btn small" href="/games/<%= g.game_id %>">Open</a>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Calendar <span class="count">upcoming</span></h2></div>
+  <% if (!calendar.length) { %>
+    <div class="section-empty">No upcoming release dates logged.</div>
+  <% } else { %>
+    <% calendar.forEach(g => { %>
+      <div class="calendar-item">
+        <a href="/games/<%= g.id %>"><%= g.title %></a>
+        <span class="date"><%= g.release_date %></span>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Backlog</h2></div>
+  <% if (!backlog.length) { %>
+    <div class="section-empty">Backlog is empty.</div>
+  <% } else { %>
+    <div class="grid">
+      <% backlog.forEach(g => { %>
+        <%- include('../partials/card', { href: `/games/${g.game_id}`, cover_url: g.cover_url, title: g.title, sub: g.platform_name }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Played</h2></div>
+  <% if (!played.length) { %>
+    <div class="section-empty">Nothing finished yet.</div>
+  <% } else { %>
+    <div class="grid">
+      <% played.forEach(g => { %>
+        <%- include('../partials/card', { href: `/games/${g.game_id}`, cover_url: g.cover_url, title: g.title, sub: `${g.platform_name} · ${g.progress.done}/${g.progress.total}` }) %>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
