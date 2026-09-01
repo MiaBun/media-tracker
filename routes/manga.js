@@ -161,6 +161,18 @@ router.post('/works', (req, res) => {
   res.redirect(`/manga/works/${info.lastInsertRowid}`);
 });
 
+router.patch('/works/:id', (req, res) => {
+  const { title, author, cover_url } = req.body;
+  db.prepare('UPDATE works SET title = ?, author = ?, cover_url = ? WHERE id = ?')
+    .run(title, author || null, cover_url || null, req.params.id);
+  res.redirect(`/manga/works/${req.params.id}`);
+});
+
+router.delete('/works/:id', (req, res) => {
+  db.prepare('DELETE FROM works WHERE id = ?').run(req.params.id);
+  res.redirect('/manga');
+});
+
 router.get('/works/:id', (req, res) => {
   const work = getWork(req.params.id);
   if (!work) return res.status(404).send('Not found');
@@ -180,6 +192,20 @@ router.post('/works/:id/volumes', (req, res) => {
   res.redirect(`/manga/works/${req.params.id}`);
 });
 
+router.patch('/volumes/:id', (req, res) => {
+  const { number, title, cover_url, release_date } = req.body;
+  const vol = db.prepare('SELECT * FROM volumes WHERE id=?').get(req.params.id);
+  db.prepare('UPDATE volumes SET number = ?, title = ?, cover_url = ?, release_date = ? WHERE id = ?')
+    .run(number, title || null, cover_url || null, release_date || null, req.params.id);
+  res.redirect(`/manga/works/${vol.work_id}`);
+});
+
+router.delete('/volumes/:id', (req, res) => {
+  const vol = db.prepare('SELECT * FROM volumes WHERE id=?').get(req.params.id);
+  db.prepare('DELETE FROM volumes WHERE id = ?').run(req.params.id);
+  res.redirect(`/manga/works/${vol.work_id}`);
+});
+
 router.post('/works/:id/chapters', (req, res) => {
   const { number, title, release_date, volume_id } = req.body;
   db.prepare('INSERT INTO chapters (work_id, volume_id, number, title, release_date) VALUES (?,?,?,?,?)')
@@ -187,28 +213,42 @@ router.post('/works/:id/chapters', (req, res) => {
   res.redirect(`/manga/works/${req.params.id}`);
 });
 
+router.patch('/chapters/:id', (req, res) => {
+  const { number, title, release_date } = req.body;
+  const ch = db.prepare('SELECT * FROM chapters WHERE id=?').get(req.params.id);
+  db.prepare('UPDATE chapters SET number = ?, title = ?, release_date = ? WHERE id = ?')
+    .run(number, title || null, release_date || null, req.params.id);
+  res.redirect(`/manga/works/${ch.work_id}`);
+});
+
+router.delete('/chapters/:id', (req, res) => {
+  const ch = db.prepare('SELECT * FROM chapters WHERE id=?').get(req.params.id);
+  db.prepare('DELETE FROM chapters WHERE id = ?').run(req.params.id);
+  res.redirect(`/manga/works/${ch.work_id}`);
+});
+
 router.post('/volumes/:id/owned', (req, res) => {
   const vol = db.prepare('SELECT * FROM volumes WHERE id=?').get(req.params.id);
   db.prepare('UPDATE volumes SET owned = ? WHERE id = ?').run(vol.owned ? 0 : 1, req.params.id);
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 router.post('/volumes/:id/status', (req, res) => {
   const { status } = req.body;
   db.prepare('UPDATE volumes SET status = ? WHERE id = ?').run(status, req.params.id);
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 router.post('/chapters/:id/owned', (req, res) => {
   const ch = db.prepare('SELECT * FROM chapters WHERE id=?').get(req.params.id);
   db.prepare('UPDATE chapters SET owned = ? WHERE id = ?').run(ch.owned ? 0 : 1, req.params.id);
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 router.post('/chapters/:id/status', (req, res) => {
   const { status } = req.body;
   db.prepare('UPDATE chapters SET status = ? WHERE id = ?').run(status, req.params.id);
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 // mark the next unread chapter of a volume as read (checkmark in "in progress")
@@ -227,7 +267,7 @@ router.post('/volumes/:id/next-chapter', (req, res) => {
       if (upNext) db.prepare("UPDATE volumes SET status = 'reading' WHERE id = ?").run(upNext.id);
     }
   }
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 // mark next unread chapter of a book as read
@@ -235,7 +275,7 @@ router.post('/works/:id/next-chapter', (req, res) => {
   const chaps = chaptersForWork(req.params.id);
   const next = chaps.find(c => c.status !== 'read');
   if (next) db.prepare("UPDATE chapters SET status = 'read' WHERE id = ?").run(next.id);
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 module.exports = router;

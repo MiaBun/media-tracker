@@ -37,7 +37,27 @@
   <% } else { %>
     <% timelines.forEach(t => { %>
       <div class="list-row" style="flex-direction:column; align-items:stretch;">
-        <div class="meta" style="margin-bottom:8px;"><div class="t"><%= t.name %></div></div>
+        <div class="meta" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+          <div class="t"><%= t.name %></div>
+          <%- include('../partials/edit', {
+            action: `/screen/timelines/${t.id}`,
+            deleteAction: `/screen/timelines/${t.id}`,
+            fields: [{ name: 'name', placeholder: 'Timeline name', value: t.name }]
+          }) %>
+        </div>
+        <% if (t.items.length) { %>
+          <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:8px;">
+            <% t.items.forEach((item, idx) => { %>
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-dim); padding:4px 8px; background:var(--surface-2); border-radius:6px;">
+                <span><%= idx + 1 %>. <%= item.title %> (<%= item.type %>)</span>
+                <form class="inline" method="POST" action="/screen/timelines/<%= t.id %>/items/<%= item.id %>">
+                  <input type="hidden" name="_method" value="DELETE">
+                  <button class="btn small danger" type="submit">Remove</button>
+                </form>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
         <form class="inline" method="POST" action="/screen/timelines/<%= t.id %>/items" style="display:flex; gap:6px;">
           <select name="show_id" style="flex:1">
             <% allShows.forEach(s => { %><option value="<%= s.id %>"><%= s.title %> (<%= s.type %>)</option><% }) %>

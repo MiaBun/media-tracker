@@ -5,6 +5,17 @@
   <div>
     <h1><%= game.title %></h1>
     <div class="sub"><% if (franchise) { %><%= franchise.name %><% } %><% if (game.release_date) { %> · <%= game.release_date %><% } %></div>
+    <%- include('../partials/edit', {
+      action: `/games/${game.id}`,
+      deleteAction: `/games/${game.id}`,
+      fields: [
+        { name: 'title', placeholder: 'Title', value: game.title },
+        { name: 'cover_url', type: 'url', placeholder: 'Cover URL', value: game.cover_url },
+        { name: 'release_date', type: 'date', value: game.release_date },
+        { name: 'franchise_id', type: 'select', value: game.franchise_id,
+          options: [{ value: '', label: 'No franchise' }, ...franchises.map(f => ({ value: f.id, label: f.name }))] },
+      ]
+    }) %>
   </div>
 </div>
 
@@ -39,12 +50,23 @@
             <button class="status-pill <%= p.status === s ? 'active' : '' %>" type="submit"><%= s.replace('_',' ') %></button>
           </form>
         <% }) %>
+        <%- include('../partials/edit', {
+          action: `/games/platforms/${p.id}`,
+          deleteAction: `/games/platforms/${p.id}`,
+          fields: [{ name: 'platform_name', placeholder: 'Platform name', value: p.platform_name }]
+        }) %>
       </div>
     </div>
 
     <% p.categories.forEach(cat => { %>
       <div class="category-block">
-        <h4><%= cat.name %></h4>
+        <h4><%= cat.name %>
+          <%- include('../partials/edit', {
+            action: `/games/categories/${cat.id}`,
+            deleteAction: `/games/categories/${cat.id}`,
+            fields: [{ name: 'name', placeholder: 'Category name', value: cat.name }]
+          }) %>
+        </h4>
         <% cat.objectives.forEach(o => { %>
           <div class="objective-row <%= o.completed ? 'done' : '' %>">
             <form class="inline" method="POST" action="/games/objectives/<%= o.id %>/toggle">
@@ -52,6 +74,11 @@
               <button class="check-btn" style="width:20px;height:20px;font-size:11px;"><%= o.completed ? '✓' : '' %></button>
             </form>
             <span><%= o.description %></span>
+            <%- include('../partials/edit', {
+              action: `/games/objectives/${o.id}`,
+              deleteAction: `/games/objectives/${o.id}`,
+              fields: [{ name: 'description', placeholder: 'Objective', value: o.description }]
+            }) %>
           </div>
         <% }) %>
         <form class="inline" method="POST" action="/games/categories/<%= cat.id %>/objectives" style="display:flex; gap:6px; margin-top:6px;">

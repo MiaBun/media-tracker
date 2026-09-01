@@ -13,6 +13,15 @@
         </form>
       <% }) %>
     </div>
+    <%- include('../partials/edit', {
+      action: `/screen/shows/${show.id}`,
+      deleteAction: `/screen/shows/${show.id}`,
+      fields: [
+        { name: 'title', placeholder: 'Title', value: show.title },
+        { name: 'cover_url', type: 'url', placeholder: 'Cover URL', value: show.cover_url },
+        { name: 'release_date', type: 'date', value: show.release_date },
+      ]
+    }) %>
   </div>
 </div>
 
@@ -40,6 +49,16 @@
           <form class="inline" method="POST" action="/screen/episodes/<%= e.id %>/watched">
             <button class="status-pill <%= e.watched ? 'active' : '' %>" type="submit"><%= e.watched ? 'Watched' : 'Mark watched' %></button>
           </form>
+          <%- include('../partials/edit', {
+            action: `/screen/episodes/${e.id}`,
+            deleteAction: `/screen/episodes/${e.id}`,
+            fields: [
+              { name: 'season', type: 'number', placeholder: 'Season', value: e.season },
+              { name: 'number', type: 'number', placeholder: 'Episode #', value: e.number },
+              { name: 'title', placeholder: 'Title', value: e.title },
+              { name: 'air_date', type: 'date', value: e.air_date },
+            ]
+          }) %>
         </div>
       </div>
     <% }) %>

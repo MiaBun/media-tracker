@@ -19,6 +19,22 @@
   <button class="btn" type="submit">Add franchise</button>
 </form>
 
+<% if (franchises.length) { %>
+  <div class="section">
+    <div class="section-head"><h2>Franchises</h2></div>
+    <% franchises.forEach(f => { %>
+      <div class="list-row">
+        <div class="meta"><div class="t"><%= f.name %></div></div>
+        <%- include('../partials/edit', {
+          action: `/games/franchises/${f.id}`,
+          deleteAction: `/games/franchises/${f.id}`,
+          fields: [{ name: 'name', placeholder: 'Franchise name', value: f.name }]
+        }) %>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
 <div class="section">
   <div class="section-head"><h2>All games <span class="count"><%= allGames.length %></span></h2></div>
   <% if (!allGames.length) { %>

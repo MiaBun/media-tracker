@@ -1,0 +1,24 @@
+<details class="edit-toggle">
+  <summary>✎ Edit</summary>
+  <form class="edit-form" method="POST" action="<%= action %>">
+    <input type="hidden" name="_method" value="PATCH">
+    <% fields.forEach(f => { %>
+      <% if (f.type === 'select') { %>
+        <select name="<%= f.name %>">
+          <% f.options.forEach(opt => { %>
+            <option value="<%= opt.value %>" <%= String(opt.value) === String(f.value || '') ? 'selected' : '' %>><%= opt.label %></option>
+          <% }) %>
+        </select>
+      <% } else { %>
+        <input type="<%= f.type || 'text' %>" <% if (f.step) { %>step="<%= f.step %>"<% } %> name="<%= f.name %>" placeholder="<%= f.placeholder %>" value="<%= f.value != null ? f.value : '' %>">
+      <% } %>
+    <% }) %>
+    <button class="btn small primary" type="submit">Save</button>
+  </form>
+  <% if (typeof deleteAction !== 'undefined' && deleteAction) { %>
+    <form class="inline" method="POST" action="<%= deleteAction %>" onsubmit="return confirm('Delete this? This cannot be undone.');" style="margin-top:6px;">
+      <input type="hidden" name="_method" value="DELETE">
+      <button class="btn small danger" type="submit">Delete</button>
+    </form>
+  <% } %>
+</details>

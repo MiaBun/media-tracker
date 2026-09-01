@@ -5,6 +5,15 @@
   <div>
     <h1><%= work.title %></h1>
     <div class="sub"><%= work.type === 'manga' ? 'Manga' : 'Book' %><% if (work.author) { %> · <%= work.author %><% } %></div>
+    <%- include('../partials/edit', {
+      action: `/manga/works/${work.id}`,
+      deleteAction: `/manga/works/${work.id}`,
+      fields: [
+        { name: 'title', placeholder: 'Title', value: work.title },
+        { name: 'author', placeholder: 'Author', value: work.author },
+        { name: 'cover_url', placeholder: 'Cover URL', value: work.cover_url },
+      ]
+    }) %>
   </div>
 </div>
 
@@ -45,6 +54,16 @@
             </div>
           </div>
         </div>
+        <%- include('../partials/edit', {
+          action: `/manga/volumes/${v.id}`,
+          deleteAction: `/manga/volumes/${v.id}`,
+          fields: [
+            { name: 'number', type: 'number', step: '0.1', placeholder: 'Volume #', value: v.number },
+            { name: 'title', placeholder: 'Title', value: v.title },
+            { name: 'cover_url', type: 'url', placeholder: 'Cover URL', value: v.cover_url },
+            { name: 'release_date', type: 'date', value: v.release_date },
+          ]
+        }) %>
         <% v.chapters.forEach(c => { %>
           <div class="chapter-row">
             <span>Ch. <%= c.number %><% if (c.title) { %> — <%= c.title %><% } %></span>
@@ -55,6 +74,15 @@
                   <button class="status-pill <%= c.status === s ? 'active' : '' %>" type="submit"><%= s %></button>
                 </form>
               <% }) %>
+              <%- include('../partials/edit', {
+                action: `/manga/chapters/${c.id}`,
+                deleteAction: `/manga/chapters/${c.id}`,
+                fields: [
+                  { name: 'number', type: 'number', step: '0.1', placeholder: 'Ch. #', value: c.number },
+                  { name: 'title', placeholder: 'Title', value: c.title },
+                  { name: 'release_date', type: 'date', value: c.release_date },
+                ]
+              }) %>
             </div>
           </div>
         <% }) %>
@@ -98,6 +126,15 @@
               </form>
             <% }) %>
           </div>
+          <%- include('../partials/edit', {
+            action: `/manga/chapters/${c.id}`,
+            deleteAction: `/manga/chapters/${c.id}`,
+            fields: [
+              { name: 'number', type: 'number', step: '0.1', placeholder: 'Ch. #', value: c.number },
+              { name: 'title', placeholder: 'Title', value: c.title },
+              { name: 'release_date', type: 'date', value: c.release_date },
+            ]
+          }) %>
         </div>
       </div>
     <% }) %>

@@ -101,7 +101,7 @@ router.get('/', (req, res) => {
     watchNext: getWatchNext(),
     watched: getWatched(),
     calendar: getCalendar(),
-    timelines: db.prepare('SELECT * FROM timelines').all(),
+    timelines: allTimelines(),
     allShows: db.prepare('SELECT id, title, type, cover_url FROM shows ORDER BY title').all(),
   });
 });
@@ -111,6 +111,18 @@ router.post('/shows', (req, res) => {
   const info = db.prepare('INSERT INTO shows (type, title, cover_url, release_date, status) VALUES (?,?,?,?,?)')
     .run(type, title, cover_url || null, release_date || null, status || 'backlog');
   res.redirect(`/screen/shows/${info.lastInsertRowid}`);
+});
+
+router.patch('/shows/:id', (req, res) => {
+  const { title, cover_url, release_date } = req.body;
+  db.prepare('UPDATE shows SET title = ?, cover_url = ?, release_date = ? WHERE id = ?')
+    .run(title, cover_url || null, release_date || null, req.params.id);
+  res.redirect(`/screen/shows/${req.params.id}`);
+});
+
+router.delete('/shows/:id', (req, res) => {
+  db.prepare('DELETE FROM shows WHERE id = ?').run(req.params.id);
+  res.redirect('/screen');
 });
 
 router.get('/shows/:id', (req, res) => {
@@ -127,17 +139,31 @@ router.post('/shows/:id/episodes', (req, res) => {
   res.redirect(`/screen/shows/${req.params.id}`);
 });
 
+router.patch('/episodes/:id', (req, res) => {
+  const { season, number, title, air_date } = req.body;
+  const ep = db.prepare('SELECT * FROM episodes WHERE id=?').get(req.params.id);
+  db.prepare('UPDATE episodes SET season = ?, number = ?, title = ?, air_date = ? WHERE id = ?')
+    .run(season || 1, number, title || null, air_date || null, req.params.id);
+  res.redirect(`/screen/shows/${ep.show_id}`);
+});
+
+router.delete('/episodes/:id', (req, res) => {
+  const ep = db.prepare('SELECT * FROM episodes WHERE id=?').get(req.params.id);
+  db.prepare('DELETE FROM episodes WHERE id = ?').run(req.params.id);
+  res.redirect(`/screen/shows/${ep.show_id}`);
+});
+
 router.post('/shows/:id/status', (req, res) => {
   const { status } = req.body;
   db.prepare('UPDATE shows SET status = ? WHERE id = ?').run(status, req.params.id);
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 router.post('/episodes/:id/watched', (req, res) => {
   const ep = db.prepare('SELECT * FROM episodes WHERE id=?').get(req.params.id);
   db.prepare('UPDATE episodes SET watched = ? WHERE id = ?').run(ep.watched ? 0 : 1, req.params.id);
   advanceTimelinesFor(ep.show_id);
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 // checkmark: mark the next unwatched episode of a show as watched
@@ -147,19 +173,35 @@ router.post('/shows/:id/next-episode', (req, res) => {
     db.prepare('UPDATE episodes SET watched = 1 WHERE id = ?').run(ep.id);
     advanceTimelinesFor(req.params.id);
   }
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 // mark a movie watched (also advances timelines)
 router.post('/shows/:id/watch-movie', (req, res) => {
   db.prepare("UPDATE shows SET status='watched' WHERE id=?").run(req.params.id);
   advanceTimelinesFor(req.params.id);
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 router.post('/timelines', (req, res) => {
   const { name } = req.body;
   db.prepare('INSERT INTO timelines (name) VALUES (?)').run(name);
+  res.redirect('/screen');
+});
+
+router.patch('/timelines/:id', (req, res) => {
+  const { name } = req.body;
+  db.prepare('UPDATE timelines SET name = ? WHERE id = ?').run(name, req.params.id);
+  res.redirect('/screen');
+});
+
+router.delete('/timelines/:id', (req, res) => {
+  db.prepare('DELETE FROM timelines WHERE id = ?').run(req.params.id);
+  res.redirect('/screen');
+});
+
+router.delete('/timelines/:id/items/:itemId', (req, res) => {
+  db.prepare('DELETE FROM timeline_items WHERE id = ? AND timeline_id = ?').run(req.params.itemId, req.params.id);
   res.redirect('/screen');
 });
 

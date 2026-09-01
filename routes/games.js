@@ -117,6 +117,17 @@ router.post('/franchises', (req, res) => {
   res.redirect('/games');
 });
 
+router.patch('/franchises/:id', (req, res) => {
+  const { name } = req.body;
+  db.prepare('UPDATE franchises SET name = ? WHERE id = ?').run(name, req.params.id);
+  res.redirect('/games');
+});
+
+router.delete('/franchises/:id', (req, res) => {
+  db.prepare('DELETE FROM franchises WHERE id = ?').run(req.params.id);
+  res.redirect('/games');
+});
+
 router.post('/games', (req, res) => {
   const { title, cover_url, release_date, franchise_id, platform_name } = req.body;
   const info = db.prepare('INSERT INTO games (franchise_id, title, cover_url, release_date) VALUES (?,?,?,?)')
@@ -142,6 +153,18 @@ router.get('/:id', (req, res) => {
     franchises: db.prepare('SELECT * FROM franchises ORDER BY name').all() });
 });
 
+router.patch('/:id', (req, res) => {
+  const { title, cover_url, release_date, franchise_id } = req.body;
+  db.prepare('UPDATE games SET title = ?, cover_url = ?, release_date = ?, franchise_id = ? WHERE id = ?')
+    .run(title, cover_url || null, release_date || null, franchise_id || null, req.params.id);
+  res.redirect(`/games/${req.params.id}`);
+});
+
+router.delete('/:id', (req, res) => {
+  db.prepare('DELETE FROM games WHERE id = ?').run(req.params.id);
+  res.redirect('/games');
+});
+
 router.post('/:id/platforms', (req, res) => {
   const { platform_name } = req.body;
   const info = db.prepare('INSERT INTO game_platforms (game_id, platform_name) VALUES (?,?)')
@@ -155,16 +178,42 @@ router.post('/:id/platforms', (req, res) => {
   res.redirect(`/games/${req.params.id}`);
 });
 
+router.patch('/platforms/:id', (req, res) => {
+  const { platform_name } = req.body;
+  const p = db.prepare('SELECT * FROM game_platforms WHERE id=?').get(req.params.id);
+  db.prepare('UPDATE game_platforms SET platform_name = ? WHERE id = ?').run(platform_name, req.params.id);
+  res.redirect(`/games/${p.game_id}`);
+});
+
+router.delete('/platforms/:id', (req, res) => {
+  const p = db.prepare('SELECT * FROM game_platforms WHERE id=?').get(req.params.id);
+  db.prepare('DELETE FROM game_platforms WHERE id = ?').run(req.params.id);
+  res.redirect(`/games/${p.game_id}`);
+});
+
 router.post('/platforms/:id/status', (req, res) => {
   const { status } = req.body;
   db.prepare('UPDATE game_platforms SET status = ? WHERE id = ?').run(status, req.params.id);
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 router.post('/:id/categories', (req, res) => {
   const { name } = req.body;
   db.prepare('INSERT INTO objective_categories (game_id, name) VALUES (?,?)').run(req.params.id, name);
   res.redirect(`/games/${req.params.id}`);
+});
+
+router.patch('/categories/:id', (req, res) => {
+  const { name } = req.body;
+  const cat = db.prepare('SELECT * FROM objective_categories WHERE id=?').get(req.params.id);
+  db.prepare('UPDATE objective_categories SET name = ? WHERE id = ?').run(name, req.params.id);
+  res.redirect(`/games/${cat.game_id}`);
+});
+
+router.delete('/categories/:id', (req, res) => {
+  const cat = db.prepare('SELECT * FROM objective_categories WHERE id=?').get(req.params.id);
+  db.prepare('DELETE FROM objective_categories WHERE id = ?').run(req.params.id);
+  res.redirect(`/games/${cat.game_id}`);
 });
 
 // adding an objective reflects it to every platform of the game automatically
@@ -178,6 +227,26 @@ router.post('/categories/:id/objectives', (req, res) => {
   res.redirect(`/games/${cat.game_id}`);
 });
 
+function gameIdForObjective(objectiveId) {
+  const row = db.prepare(`
+    SELECT c.game_id FROM objectives o JOIN objective_categories c ON c.id = o.category_id WHERE o.id = ?
+  `).get(objectiveId);
+  return row ? row.game_id : null;
+}
+
+router.patch('/objectives/:id', (req, res) => {
+  const { description } = req.body;
+  const gameId = gameIdForObjective(req.params.id);
+  db.prepare('UPDATE objectives SET description = ? WHERE id = ?').run(description, req.params.id);
+  res.redirect(`/games/${gameId}`);
+});
+
+router.delete('/objectives/:id', (req, res) => {
+  const gameId = gameIdForObjective(req.params.id);
+  db.prepare('DELETE FROM objectives WHERE id = ?').run(req.params.id);
+  res.redirect(`/games/${gameId}`);
+});
+
 router.post('/objectives/:id/toggle', (req, res) => {
   const { platform_id } = req.body;
   const row = db.prepare('SELECT * FROM objective_completion WHERE objective_id=? AND platform_id=?')
@@ -189,7 +258,7 @@ router.post('/objectives/:id/toggle', (req, res) => {
     db.prepare('INSERT INTO objective_completion (objective_id, platform_id, completed) VALUES (?,?,1)')
       .run(req.params.id, platform_id);
   }
-  res.redirect('back');
+  res.redirect(req.get('Referer') || '/');
 });
 
 module.exports = router;
