@@ -36,15 +36,19 @@
 <% } %>
 
 <div class="section">
-  <div class="section-head"><h2>All games <span class="count"><%= allGames.length %></span></h2></div>
-  <% if (!allGames.length) { %>
-    <div class="section-empty">Nothing added yet — use the form above.</div>
+  <div class="section-head"><h2>Currently playing</h2></div>
+  <% if (!inProgress.length) { %>
+    <div class="section-empty">Nothing in progress right now.</div>
   <% } else { %>
-    <div class="grid">
-      <% allGames.forEach(g => { %>
-        <%- include('../partials/card', { href: `/games/${g.id}`, cover_url: g.cover_url, title: g.title, sub: g.franchise_name || '' }) %>
-      <% }) %>
-    </div>
+    <% inProgress.forEach(g => { %>
+      <div class="list-row">
+        <div class="meta">
+          <div class="t"><%= g.title %> <span class="badge"><%= g.platform_name %></span></div>
+          <div class="s"><%= g.progress.done %> / <%= g.progress.total %> objectives complete<% if (g.franchise_name) { %> · <%= g.franchise_name %><% } %></div>
+        </div>
+        <a class="btn small" href="/games/<%= g.game_id %>">Open</a>
+      </div>
+    <% }) %>
   <% } %>
 </div>
 
@@ -67,19 +71,15 @@
 </div>
 
 <div class="section">
-  <div class="section-head"><h2>Currently playing</h2></div>
-  <% if (!inProgress.length) { %>
-    <div class="section-empty">Nothing in progress right now.</div>
+  <div class="section-head"><h2>All games <span class="count"><%= allGames.length %></span></h2></div>
+  <% if (!allGames.length) { %>
+    <div class="section-empty">Nothing added yet — use the form above.</div>
   <% } else { %>
-    <% inProgress.forEach(g => { %>
-      <div class="list-row">
-        <div class="meta">
-          <div class="t"><%= g.title %> <span class="badge"><%= g.platform_name %></span></div>
-          <div class="s"><%= g.progress.done %> / <%= g.progress.total %> objectives complete<% if (g.franchise_name) { %> · <%= g.franchise_name %><% } %></div>
-        </div>
-        <a class="btn small" href="/games/<%= g.game_id %>">Open</a>
-      </div>
-    <% }) %>
+    <div class="grid">
+      <% allGames.forEach(g => { %>
+        <%- include('../partials/card', { href: `/games/${g.id}`, cover_url: g.cover_url, title: g.title, sub: g.franchise_name || '' }) %>
+      <% }) %>
+    </div>
   <% } %>
 </div>
 
