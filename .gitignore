@@ -1,5 +1,4 @@
 node_modules/
-db/trackr.sqlite
 db/trackr.sqlite-shm
 db/trackr.sqlite-wal
 .DS_Store
