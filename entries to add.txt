@@ -1,13 +1,3 @@
-Lies of P
-Like a Dragon: Ishin!
-Middle-earth™: Shadow of War™
-The Witcher 3: Wild Hunt
-Planet Coaster
-Fe
-Clair Obscur: Expedition 33
-The Witcher 2: Assassins of Kings Enhanced Edition
-LEGO® The Lord of the Rings™
-Assassin's Creed III Remastered
 DuckTales Remastered
 Batman: Arkham Asylum GOTY Edition
 Assassin’s Creed® Chronicles: China
@@ -1191,6 +1181,7 @@ warhammer 40k space marine
 metal gear solid master collection 2
 rythm heaven groove
 witcher 3 remastered
+
 a silent voice vol 1
 a silent voice vol 2
 a silent voice vol 3
