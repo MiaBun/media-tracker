@@ -19,22 +19,6 @@
   <button class="btn" type="submit">Add franchise</button>
 </form>
 
-<% if (franchises.length) { %>
-  <div class="section">
-    <div class="section-head"><h2>Franchises</h2></div>
-    <% franchises.forEach(f => { %>
-      <div class="list-row">
-        <div class="meta"><div class="t"><%= f.name %></div></div>
-        <%- include('../partials/edit', {
-          action: `/games/franchises/${f.id}`,
-          deleteAction: `/games/franchises/${f.id}`,
-          fields: [{ name: 'name', placeholder: 'Franchise name', value: f.name }]
-        }) %>
-      </div>
-    <% }) %>
-  </div>
-<% } %>
-
 <div class="section">
   <div class="section-head"><h2>Currently playing</h2></div>
   <% if (!inProgress.length) { %>
@@ -71,19 +55,6 @@
 </div>
 
 <div class="section">
-  <div class="section-head"><h2>Backlog</h2></div>
-  <% if (!backlog.length) { %>
-    <div class="section-empty">Backlog is empty.</div>
-  <% } else { %>
-    <div class="grid">
-      <% backlog.forEach(g => { %>
-        <%- include('../partials/card', { href: `/games/${g.game_id}`, cover_url: g.cover_url, title: g.title, sub: g.platform_name }) %>
-      <% }) %>
-    </div>
-  <% } %>
-</div>
-
-<div class="section">
   <div class="section-head"><h2>Calendar <span class="count">upcoming</span></h2></div>
   <% if (!calendar.length) { %>
     <div class="section-empty">No upcoming release dates logged.</div>
@@ -94,6 +65,19 @@
         <span class="date"><%= g.release_date %></span>
       </div>
     <% }) %>
+  <% } %>
+</div>
+
+<div class="section">
+  <div class="section-head"><h2>Backlog</h2></div>
+  <% if (!backlog.length) { %>
+    <div class="section-empty">Backlog is empty.</div>
+  <% } else { %>
+    <div class="grid">
+      <% backlog.forEach(g => { %>
+        <%- include('../partials/card', { href: `/games/${g.game_id}`, cover_url: g.cover_url, title: g.title, sub: g.platform_name }) %>
+      <% }) %>
+    </div>
   <% } %>
 </div>
 
@@ -122,3 +106,19 @@
     </div>
   <% } %>
 </div>
+
+<% if (franchises.length) { %>
+  <div class="section">
+    <div class="section-head"><h2>Franchises</h2></div>
+    <% franchises.forEach(f => { %>
+      <div class="list-row">
+        <div class="meta"><div class="t"><%= f.name %></div></div>
+        <%- include('../partials/edit', {
+          action: `/games/franchises/${f.id}`,
+          deleteAction: `/games/franchises/${f.id}`,
+          fields: [{ name: 'name', placeholder: 'Franchise name', value: f.name }]
+        }) %>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
