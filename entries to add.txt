@@ -1,44 +1,7 @@
-S.T.A.L.K.E.R. 2: Heart of Chornobyl
-S.T.A.L.K.E.R.: Call of Pripyat
-S.T.A.L.K.E.R.: Clear Sky
-S.T.A.L.K.E.R.: Shadow of Chernobyl
-SaGa Frontier Remastered
-SaGa SCARLET GRACE: AMBITIONS™
-Saints Row
-Secret of Mana
-Shenmue I & II
-Shin Megami Tensei III Nocturne HD Remaster
-Shin Megami Tensei V: Vengeance
-SILENT HILL 2
-SILENT HILL f
-Slime Rancher
-Sonic Frontiers
-Sons Of The Forest
-Soul Hackers 2
-Split Fiction
-STAR OCEAN THE DIVINE FORCE
-STAR OCEAN THE SECOND STORY R
-STAR OCEAN™ - THE LAST HOPE™ - 4K & Full HD Remaster
-STAR WARS Jedi: Fallen Order™
-Subnautica
-Sunset Overdrive
-Tales from the Borderlands
-Tchia
-Tiny Tina's Wonderlands
-Tom Clancy's The Division 2
-Tomb Raider I-III Remastered Starring Lara Croft
-Tomb Raider IV-VI Remastered
-Tomb Raider: Legend
-Tomb Raider: Underworld
-Trials of Mana
-Unravel
-Unravel Two
-Untitled Goose Game
 Valheim
 Visions of Mana
 Watch Dogs: Legion
 A Way Out
-
 Wolfenstein II: The New Colossus
 Wolfenstein: The New Order
 Wolfenstein: The Old Blood
@@ -54,6 +17,7 @@ Yakuza Kiwami
 Yakuza Kiwami 2
 Yakuza Kiwami 3 & Dark Ties
 Yakuza: Like a Dragon
+
 Just Cause
 Max Payne 2: The Fall of Max Payne
 Max Payne
