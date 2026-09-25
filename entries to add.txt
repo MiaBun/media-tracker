@@ -1,37 +1,3 @@
-Grounded 2
-Magic Inn
-Fate/hollow ataraxia REMASTERED
-Mafia: The Old Country
-METAL GEAR SOLID Δ: SNAKE EATER
-Lost Soul Aside™
-Flowers And Favours: Florist Simulator
-Borderlands 4
-Dying Light: The Beast
-Trails in the Sky 1st Chapter
-Trails in the Sky 2nd Chapter
-Slime Rancher 2
-Sonic Racing: CrossWorlds
-Atelier Resleriana: The Red Alchemist & the White Guardian
-FINAL FANTASY TACTICS - The Ivalice Chronicles
-KALPA: Cosmic Symphony
-Digimon Story Time Stranger
-Little Nightmares III
-Pax Dei
-Dispatch
-PowerWash Simulator 2
-The Outer Worlds 2
-DRAGON QUEST I & II HD-2D Remake
-My Little Puppy
-Atelier Ryza: Ever Darkness & the Secret Hideout DX
-Atelier Ryza 3: Alchemist of the End & the Secret Key DX
-Atelier Ryza 2: Lost Legends & the Secret Fairy DX
-Solo Leveling: ARISE OVERDRIVE
-Guild Wars® Reforged
-OCTOPATH TRAVELER 0
-CODE VEIN II
-DRAGON QUEST VII Reimagined
-Nioh 3
-Dino Crisis
 REANIMAL
 Rayman: 30th Anniversary Edition
 PARANORMASIGHT: The Mermaid's Curse
@@ -57,9 +23,6 @@ LEGO® Batman™: Legacy of the Dark Knight
 La Divina Commedia
 Moomintroll: Winter's Warmth
 Palworld: Palfarm
-Steam Frame
-Steam Controller
-Steam Machine
 Persona 4 Revival
 Deus Ex Remastered
 Suikoden STAR LEAP
@@ -710,6 +673,25 @@ romancing saga 3: destinies united
 kirby and the world beyond 
 civilization 8
 civilization 7
+conan exiles
+dressmaker
+drag'n wash
+The Legend of Heroes: Trails in the Sky	2004	The first game of the Trails sub-series and the first of the Liberl arc. Originally released as The Legend of Heroes VI.
+The Legend of Heroes: Trails in the Sky SC	2006	
+The Legend of Heroes: Trails in the Sky the 3rd	2007	The final part of the Liberl arc.
+Ys vs. Trails in the Sky	2010	Crossover fighting game containing characters from the Ys and Trails series.
+The Legend of Heroes: Trails from Zero	The first part of the Crossbell arc.
+The Legend of Heroes: Trails to Azure	2011	The final part of the Crossbell arc.
+The Legend of Nayuta: Boundless Trails	2012	Action role-playing spin-off.
+The Legend of Heroes: Trails of Cold Steel	2013	The first part of the Erebonia arc.
+The Legend of Heroes: Trails of Cold Steel II	2014	
+The Legend of Heroes: Trails at Sunrise	2016	Gacha game developed by UserJoy Technology.
+The Legend of Heroes: Trails of Cold Steel III	2017	
+The Legend of Heroes: Trails of Cold Steel IV	2018	The final part of the Erebonia arc.
+The Legend of Heroes: Trails into Reverie	2020	The epilogue to both the Crossbell and Erebonia arcs.
+The Legend of Heroes: Trails Through Daybreak	2021	The first part of the Calvard arc.
+The Legend of Heroes: Trails Through Daybreak II	2022	
+The Legend of Heroes: Trails Beyond the Horizon	
 
 a silent voice vol 1
 a silent voice vol 2
